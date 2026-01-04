@@ -57,6 +57,8 @@ Zerolan Project 由 [ZerolanLiveRobot](https://github.com/AkagawaTsurunaki/Zerol
 
 ### 安装本项目依赖
 
+本项目需要您提前安装 git，因为克隆项目、更新项目以及 [ZerolanData](https://github.com/AkagawaTsurunaki/zerolan-data) 的安装都离不开 git。您需要根据您的操作系统选择安装 git。
+
 如果你使用的是 Windows 操作系统，且正在使用较高版本的 Python，请检查您是否已经安装了 [Visual C++ Build Tools](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)，部分 Python 依赖的库可能会需要在您的操作系统上编译后安装。当然，更推荐您使用较低版本的 Python，例如 `3.10` 和 `3.11`。
 
 运行指令，这会创建一个虚拟环境并激活，然后自动安装本项目需要的依赖包：
@@ -83,6 +85,17 @@ python main.py
 2. 手动修改：直接找到 `./resources/config.yaml` 文件并按照文件内的注释引导填写对应的配置。
 
 若在此期间出现任何报错或问题，都可以通过新建 Issue 获取帮助，届时还恳请您提供完整的日志和复现流程。
+
+### 获取更新
+
+本项目将会持续发布于主分支 `main`，因此可以执行下列代码更新本项目的代码：
+
+```shell
+git checkout main
+git pull
+```
+
+当然，如果您已经修改了代码，此操作可能会自动合并代码，但是部分未能解决的冲突需要您自行处理。建议在开发时使用另一个分支而不是主分支 `main`。
 
 ### * Minecraft 支持
 

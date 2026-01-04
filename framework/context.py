@@ -20,7 +20,6 @@ from pipeline.vla.showui.showui_sync import ShowUISyncPipeline
 from services.browser.browser import Browser
 from services.game.config import PlatformEnum
 from services.game.minecraft.app import KonekoMinecraftAIAgent
-from services.live2d.live2d_viewer import Live2DViewer
 from services.live_stream.bilibili import BilibiliService
 from services.live_stream.twitch import TwitchService
 from services.live_stream.youtube import YouTubeService
@@ -71,7 +70,7 @@ class ZerolanLiveRobotContext:
         self.bot_name: str | None = None
         self.master_name: str = "AkagawaTsurunaki"
         self.live2d_model: str | None = None
-        self.live2d_viewer: Live2DViewer | None = None
+        self.live2d_viewer = None
         self.obs: ObsStudioWsClient | None = None
         self.res_server: ResourceServer | None = None
         self.game_agent = None
@@ -134,4 +133,5 @@ class ZerolanLiveRobotContext:
         # Agents
         self.tool_agent = ToolAgent(_config.pipeline.llm)
         if _config.service.live2d_viewer.enable:
+            from services.live2d.live2d_viewer import Live2DViewer
             self.live2d_viewer = Live2DViewer(_config.service.live2d_viewer)
