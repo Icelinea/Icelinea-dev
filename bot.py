@@ -227,9 +227,11 @@ class ZerolanLiveRobot(BaseBot):
                     so = model_scale(info, prediction.transcript)
                     self.playground.modify_game_object_scale(so)
             else:
-                tool_called = self.custom_agent.run(prediction.transcript)
-                if tool_called:
-                    logger.debug("Tool called.")
+                if self.playground:
+                    assert self.custom_agent is not None
+                    tool_called = self.custom_agent.run(prediction.transcript)
+                    if tool_called:
+                        logger.debug("Tool called.")
             if self.playground:
                 if self.playground.is_connected:
                     self.playground.show_user_input_text(prediction.transcript)
