@@ -1,5 +1,7 @@
 import platform
 from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Tuple, Optional
 
 from PIL.Image import Image
 
@@ -8,7 +10,7 @@ import devices.headless
 
 class BaseScreen(ABC):
     @abstractmethod
-    def safe_capture(self, win_title: str = None, k: float = 1.0) -> (Image, str):
+    def safe_capture(self, win_title: str = None, k: float = 1.0) -> Tuple[Optional[Image], Optional[Path]]:
         pass
 
 
@@ -25,7 +27,7 @@ class Screen:
         else:
             raise Exception("Screenshot on a headless system is not supported.")
 
-    def safe_capture(self, win_title: str = None, k: float = 1.0) -> (Image, str):
+    def safe_capture(self, win_title: str = None, k: float = 1.0) -> Tuple[Optional[Image], Optional[Path]]:
         if not self._headless:
             return self._screen.safe_capture(win_title, k)
         else:
