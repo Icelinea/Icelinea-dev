@@ -23,7 +23,7 @@ from common.io.file_type import AudioFileType
 from common.utils import audio_util, math_util
 from common.utils.img_util import is_image_uniform
 from common.utils.str_util import split_by_punc, is_blank
-from event.event_data import DeviceMicrophoneVADEvent, DeviceScreenCapturedEvent, PipelineOutputLLMEvent, \
+from event.event_data import DeviceMicrophoneVADEvent, DeviceKeyboardPressEvent, DeviceScreenCapturedEvent, PipelineOutputLLMEvent, \
     PipelineImgCapEvent, \
     QQMessageEvent, DeviceMicrophoneSwitchEvent, PipelineOutputTTSEvent, PipelineASREvent, \
     PipelineOCREvent, SecondEvent, ConfigFileModifiedEvent, LiveStreamDanmakuEvent
@@ -60,6 +60,9 @@ class ZerolanLiveRobot(BaseBot):
             if _config.system.default_enable_microphone:
                 vad_thread = KillableThread(target=self.mic.start, daemon=True, name="VADThread")
                 threads.append(vad_thread)
+
+            keyboard_thread = KillableThread(target=self.keyboard.start, daemon=True, name="KeyboardThread")
+            threads.append(keyboard_thread)
 
             speaker_thread = KillableThread(target=self.speaker.start, daemon=True, name="SpeakerThread")
             threads.append(speaker_thread)
@@ -135,6 +138,41 @@ class ZerolanLiveRobot(BaseBot):
             # self.vad.resume()
             # logger.info("Because ZerolanPlayground client disconnected, open the local microphone.")
             pass
+
+        @emitter.on(EventKeyRegistry.Device.KEYBOARD_HOTKEY_PRESS)
+        def hotkey_handler(event: DeviceKeyboardPressEvent):
+            logger.info(f'Hotkey toggle: {event.hotkey}')
+            # 判断 hotkey 内容
+            if event.hotkey == _config.system.microphone_hotkey:
+                with self.keyboard._microphone_state_lock:
+                    # microphone
+                    if self.mic.is_set_talk_enabled_event():
+                        logger.debug(f'Hotkey toggled: MIC OFF')
+
+                        # 关麦
+                        self.mic.unset_talk_enabled_event()
+                        
+                        # 强制 emit 已经收集的片段
+                        self.mic.force_commit(is_emit=True)
+
+                        # 播放停止提示音
+                        pass
+                    else:
+                        logger.debug(f'Hotkey toggled: MIC ON')
+
+                        # 仅清空可能遗留的音频
+                        self.mic.force_commit(is_emit=False)
+
+                        # 播放开始提示音，block=True
+                        pass
+                        
+                        # 开麦
+                        self.mic.set_talk_enabled_event()
+            elif False:
+                # example
+                pass
+            else:
+                raise ValueError(f'Invaild hotkey value but still pass the code until here.')
 
         @emitter.on(EventKeyRegistry.Device.MICROPHONE_SWITCH)
         def on_open_microphone(event: DeviceMicrophoneSwitchEvent):
@@ -232,12 +270,12 @@ class ZerolanLiveRobot(BaseBot):
                     tool_called = self.custom_agent.run(prediction.transcript)
                     if tool_called:
                         logger.debug("Tool called.")
+                self.emit_llm_prediction(prediction.transcript)
             if self.playground:
                 if self.playground.is_connected:
                     self.playground.show_user_input_text(prediction.transcript)
             if self.obs:
                 self.obs.subtitle(prediction.transcript, which="user")
-            self.emit_llm_prediction(prediction.transcript)
 
         @emitter.on(EventKeyRegistry.LiveStream.DANMAKU)
         def on_danmaku(event: LiveStreamDanmakuEvent):

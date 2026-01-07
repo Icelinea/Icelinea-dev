@@ -9,6 +9,7 @@ from manager.llm_prompt_manager import LLMPromptManager
 from manager.model_manager import ModelManager
 from manager.tts_prompt_manager import TTSPromptManager
 from devices.microphone import SmartMicrophone
+from devices.keyboard import SmartKeyboard
 from pipeline.asr.asr_sync import ASRSyncPipeline
 from pipeline.db.milvus.milvus_sync import MilvusSyncPipeline
 from pipeline.imgcap.imgcap_sync import ImgCapSyncPipeline
@@ -126,7 +127,8 @@ class ZerolanLiveRobotContext:
             self.playground = PlaygroundBridge(config=_config.service.playground)
         if _config.service.qqbot.enable:
             self.qq = QQBotBridge(_config.service.qqbot)
-        self.mic = SmartMicrophone()
+        self.mic = SmartMicrophone(vad_mode=_config.system.microphone_vad_mode)
+        self.keyboard = SmartKeyboard(mic_hotkey_str=_config.system.microphone_hotkey)
         if _config.service.obs.enable:
             self.obs = ObsStudioWsClient(_config.service.obs)
         self.config_page = DynamicConfigPage(_config)

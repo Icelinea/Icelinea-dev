@@ -66,6 +66,15 @@ class LLMSyncPipeline(CommonModelPipeline):
                     )
 
                 return _openai_predict(query, wrapper_deepseek)
+            elif self.model_id == "doubao-seed-1-6-flash-250715":
+                def wrapper_doubao(messages):
+                    return self._remote_model.chat.completions.create(
+                        model=self.model_id,
+                        messages=messages,
+                        stream=False
+                    )
+
+                return _openai_predict(query, wrapper_doubao)
             else:
                 raise NotImplementedError(f"Unsupported model {self.model_id}")
         else:

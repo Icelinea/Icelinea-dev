@@ -78,6 +78,11 @@ class DeviceScreenCapturedEvent(BaseEvent):
     type: str = EventKeyRegistry.Device.SCREEN_CAPTURED
 
 
+class DeviceKeyboardPressEvent(BaseEvent):
+    hotkey: str
+    type: str = EventKeyRegistry.Device.KEYBOARD_HOTKEY_PRESS
+
+
 class DeviceMicrophoneVADEvent(BaseEvent):
     speech: bytes
     audio_type: AudioFileType
