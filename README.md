@@ -59,9 +59,9 @@ Zerolan Project 由 [ZerolanLiveRobot](https://github.com/AkagawaTsurunaki/Zerol
 
 本项目需要您提前安装 git，因为克隆项目、更新项目以及 [ZerolanData](https://github.com/AkagawaTsurunaki/zerolan-data) 的安装都离不开 git。您需要根据您的操作系统选择安装 git。
 
-如果你使用的是 Windows 操作系统，且正在使用较高版本的 Python，请检查您是否已经安装了 [Visual C++ Build Tools](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)，部分 Python 依赖的库可能会需要在您的操作系统上编译后安装。当然，更推荐您使用较低版本的 Python，例如 `3.10` 和 `3.11`。
+如果你使用的是 Windows 操作系统，请检查您是否已经安装了 [Visual C++ Build Tools](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)，部分 Python 依赖的库可能会需要在您的操作系统上编译后安装。
 
-运行指令，这会创建一个虚拟环境并激活，然后自动安装本项目需要的依赖包：
+运行指令，这会创建一个虚拟环境并激活（推荐使用 Python 3.11），然后自动安装本项目需要的依赖包：
 
 ```shell
 conda create --name ZerolanLiveRobot python=3.11
