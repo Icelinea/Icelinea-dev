@@ -25,6 +25,7 @@ class EventKeyRegistry:
         KEYBOARD_HOTKEY_PRESS = "devices.keyboard"
         MICROPHONE_VAD = "service.vad.speech_chunk"
         MICROPHONE_SWITCH = "switch_vad"
+        SPEAKER_PLAY = 'device.speaker.over'
 
     class LiveStream:
         CONNECTED = "service.live_stream.connected"

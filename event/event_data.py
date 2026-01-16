@@ -44,6 +44,7 @@ class SecondEvent(BaseEvent):
     elapsed: int = 0
     type: str = EventKeyRegistry.System.SECOND
 
+
 ### Pipeline ###
 class PipelineASREvent(BaseEvent):
     prediction: ASRPrediction
@@ -94,6 +95,11 @@ class DeviceMicrophoneVADEvent(BaseEvent):
 class DeviceMicrophoneSwitchEvent(BaseEvent):
     switch: bool
     type: str = EventKeyRegistry.Device.MICROPHONE_SWITCH
+
+
+class DeviceSpeakerPlayEvent(BaseEvent):
+    audio_path: Path
+    type: str = EventKeyRegistry.Device.SPEAKER_PLAY
 
 
 ### Live streaming ###
