@@ -1,16 +1,18 @@
 from typing import Union
 
 from common.concurrent.abs_runnable import ThreadRunnable
+from devices.headless import is_headless
 from event.event_emitter import emitter
 from event.event_data import DeviceKeyboardPressEvent
 import threading
 from loguru import logger
 
-try:
-    from pynput import keyboard
-    from pynput.keyboard import Key, KeyCode
-except:
-    raise ImportError(f'Pynput not installed, please try "pip install pynput" to solve this problem.')
+if not is_headless():
+    try:
+        from pynput import keyboard
+        from pynput.keyboard import Key, KeyCode
+    except:
+        raise ImportError(f'Pynput not installed, please try "pip install pynput" to solve this problem.')
 
 """
 Keyborad 函数只监听所有特定的按键, 并触发控制函数 hotkey_handler

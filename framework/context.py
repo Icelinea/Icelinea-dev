@@ -3,13 +3,13 @@ from agent.custom_agent import CustomAgent
 from agent.tool_agent import ToolAgent
 from character.filter.strategy import FirstMatchedFilter
 from common.generator.gradio_gen import DynamicConfigPage
+from devices.headless import is_headless
 from devices.speaker import Speaker
 from manager.config_manager import get_config
 from manager.llm_prompt_manager import LLMPromptManager
 from manager.model_manager import ModelManager
 from manager.tts_prompt_manager import TTSPromptManager
 from devices.microphone import SmartMicrophone
-from devices.keyboard import SmartKeyboard
 from pipeline.asr.asr_sync import ASRSyncPipeline
 from pipeline.db.milvus.milvus_sync import MilvusSyncPipeline
 from pipeline.imgcap.imgcap_sync import ImgCapSyncPipeline
@@ -129,7 +129,12 @@ class ZerolanLiveRobotContext:
 
             self.qq: QQBotService = QQBotService(_config.service.qqbot)
         self.mic = SmartMicrophone(vad_mode=_config.system.microphone_vad_mode)
-        self.keyboard = SmartKeyboard(hotkeys=[_config.system.microphone_hotkey])
+
+        # Headless system can not load `pynput` and `pygame`
+        self.keyboard = None
+        if not is_headless():
+            from devices.keyboard import SmartKeyboard
+            self.keyboard = SmartKeyboard(hotkeys=[_config.system.microphone_hotkey])
         if _config.service.obs.enable:
             self.obs = ObsStudioWsClient(_config.service.obs)
         self.config_page = DynamicConfigPage(_config)

@@ -64,8 +64,9 @@ class ZerolanLiveRobot(BaseBot):
                 vad_thread = KillableThread(target=self.mic.start, daemon=True, name="VADThread")
                 threads.append(vad_thread)
 
-            keyboard_thread = KillableThread(target=self.keyboard.start, daemon=True, name="KeyboardThread")
-            threads.append(keyboard_thread)
+            if self.keyboard is not None:
+                keyboard_thread = KillableThread(target=self.keyboard.start, daemon=True, name="KeyboardThread")
+                threads.append(keyboard_thread)
 
             speaker_thread = KillableThread(target=self.speaker.start, daemon=True, name="SpeakerThread")
             threads.append(speaker_thread)
