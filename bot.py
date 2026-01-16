@@ -422,6 +422,9 @@ class ZerolanLiveRobot(BaseBot):
         if self.enable_exp_memory:
             if self.exp_memory(text, is_filtered, prediction.response, len(prediction.response)):
                 self.llm_prompt_manager.reset_history(prediction.history)
+        else:
+            # If experiment memory disabled, history should be updated for each chat commit.
+            self.llm_prompt_manager.reset_history(prediction.history)
 
         if not direct_return:
             emitter.emit(PipelineOutputLLMEvent(prediction=prediction))
