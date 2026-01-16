@@ -7,6 +7,8 @@ import pygame
 
 from common.concurrent.abs_runnable import ThreadRunnable
 from common.concurrent.killable_thread import KillableThread
+from event.event_data import DeviceSpeakerPlayEvent
+from event.event_emitter import emitter
 
 pygame.mixer.init()
 _system_sound = False
@@ -52,8 +54,8 @@ class Speaker(ThreadRunnable):
             if self.audio_clips.empty():
                 self._semaphore.clear()
             self._semaphore.wait()
-
             audio_clip = self.audio_clips.get()
+            emitter.emit(DeviceSpeakerPlayEvent(audio_path=audio_clip))
             self.playsound(audio_clip, block=True)
 
     def enqueue_sound(self, path_or_data: Path):

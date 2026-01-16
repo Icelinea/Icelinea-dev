@@ -2,6 +2,7 @@ import asyncio
 import os
 from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
+from queue import Queue
 
 from loguru import logger
 from zerolan.data.data.prompt import TTSPrompt
@@ -23,10 +24,11 @@ from common.io.file_type import AudioFileType
 from common.utils import audio_util, math_util
 from common.utils.img_util import is_image_uniform
 from common.utils.str_util import split_by_punc, is_blank
-from event.event_data import DeviceMicrophoneVADEvent, DeviceKeyboardPressEvent, DeviceScreenCapturedEvent, PipelineOutputLLMEvent, \
+from event.event_data import DeviceMicrophoneVADEvent, DeviceKeyboardPressEvent, DeviceScreenCapturedEvent, \
+    PipelineOutputLLMEvent, \
     PipelineImgCapEvent, \
     QQMessageEvent, DeviceMicrophoneSwitchEvent, PipelineOutputTTSEvent, PipelineASREvent, \
-    PipelineOCREvent, SecondEvent, ConfigFileModifiedEvent, LiveStreamDanmakuEvent
+    PipelineOCREvent, SecondEvent, ConfigFileModifiedEvent, LiveStreamDanmakuEvent, DeviceSpeakerPlayEvent
 from event.event_emitter import emitter
 from event.registry import EventKeyRegistry
 from framework.base_bot import BaseBot
@@ -46,6 +48,7 @@ class ZerolanLiveRobot(BaseBot):
         self.enable_exp_memory = False
         self.enable_sentiment_analysis = False
         self.enable_split_by_punc = True
+        self.subtitles_queue = Queue()
         self.init()
         logger.info("🤖 Zerolan Live Robot: Initialized services successfully.")
 
@@ -361,6 +364,14 @@ class ZerolanLiveRobot(BaseBot):
         def on_config_modified(_: ConfigFileModifiedEvent):
             config = get_config()
 
+        @emitter.on(EventKeyRegistry.Device.SPEAKER_PLAY)
+        def on_speaker_play(event: DeviceSpeakerPlayEvent):
+            if self.obs is not None:
+                assert event.audio_path.exists()
+                sample_rate, num_channels, duration = audio_util.get_audio_info(event.audio_path)
+                text = self.subtitles_queue.get()
+                self.obs.subtitle(text, which="assistant", duration=math_util.clamp(0, 5, duration - 1))
+
     def _tts_without_block(self, tts_prompt: TTSPrompt, text: str):
         def wrapper():
             query = TTSQuery(
@@ -373,10 +384,6 @@ class ZerolanLiveRobot(BaseBot):
             )
             prediction = self.tts.predict(query=query)
             logger.info(f"TTS: {query.text}")
-            sample_rate, num_channels, duration = audio_util.get_audio_info(prediction.wave_data, prediction.audio_type)
-
-            if self.obs is not None:
-                self.obs.subtitle(text, which="assistant", duration=math_util.clamp(0, 5, duration - 1))
 
             self.play_tts(PipelineOutputTTSEvent(prediction=prediction, transcript=text))
 
@@ -459,6 +466,8 @@ class ZerolanLiveRobot(BaseBot):
 
     def play_tts(self, event: PipelineOutputTTSEvent):
         prediction = event.prediction
+        text = event.transcript
+        self.subtitles_queue.put(text)
         audio_path = save_audio(wave_data=prediction.wave_data, format=AudioFileType(prediction.audio_type),
                                 prefix='tts')
         if self.live2d_viewer:
@@ -466,9 +475,10 @@ class ZerolanLiveRobot(BaseBot):
         if self.playground:
             if self.playground.is_connected:
                 self.playground.play_speech(bot_id=self.bot_id, audio_path=audio_path,
-                                            transcript=event.transcript, bot_name=self.bot_name)
+                                            transcript=text, bot_name=self.bot_name)
                 logger.debug("Remote speaker enqueue speech data")
         else:
             # `playsound(audio_path, block=True)` will block the thread, use `enqueue_sound(audio_path)` instead
             self.speaker.enqueue_sound(audio_path)
             logger.debug("Local speaker enqueue speech data")
+
