@@ -34,6 +34,7 @@ gradio
 webrtcvad
 live2d-py==0.5.0 # Windows only
 pynput  # devices/keyboard.py
+ncatbot # QQ bot
 # If Linux, uncomment following
 # mss
 PyQt5
