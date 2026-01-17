@@ -150,9 +150,10 @@ class KonekoServerCallInstruction(BaseEvent):
 ### QQ ###
 class QQMessageEvent(BaseEvent):
     message: str
-    group_id: int | None
+    group_id: str | None
+    sender_id: str
+    images: List[Path] | None = None
     type: str = EventKeyRegistry.QQBot.QQ_MESSAGE
-
 
 ### Zerolan Playground ###
 class PlaygroundConnectedEvent(BaseEvent):

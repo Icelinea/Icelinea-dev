@@ -1,6 +1,6 @@
 # Zerolan Live Robot
 
-![Static Badge](https://img.shields.io/badge/Python%20-%203.10~3.11%20-%20blue) ![Static Badge](https://img.shields.io/badge/License-MIT-orange) ![Static Badge](https://img.shields.io/badge/AI%20VTuber-blue) ![Static Badge](https://img.shields.io/badge/Bilibili-fb7299) ![Static Badge](https://img.shields.io/badge/Youtube-ff0000) ![Static Badge](https://img.shields.io/badge/Twitch-9044fe) ![Static Badge](https://img.shields.io/badge/ASR-purple) ![Static Badge](https://img.shields.io/badge/LLM-purple) ![Static Badge](https://img.shields.io/badge/TTS-purple) ![Static Badge](https://img.shields.io/badge/OCR-purple) ![Static Badge](https://img.shields.io/badge/ImageCaptioning-purple) ![Static Badge](https://img.shields.io/badge/VideoCaptioning-purple) ![Static Badge](https://img.shields.io/badge/MinecraftAIAgent-purple) ![Static Badge](https://img.shields.io/badge/ver-2.2.0-green)
+![Static Badge](https://img.shields.io/badge/Python%20-%203.10~3.11%20-%20blue) ![Static Badge](https://img.shields.io/badge/License-MIT-orange) ![Static Badge](https://img.shields.io/badge/AI%20VTuber-blue) ![Static Badge](https://img.shields.io/badge/Bilibili-fb7299) ![Static Badge](https://img.shields.io/badge/Youtube-ff0000) ![Static Badge](https://img.shields.io/badge/Twitch-9044fe) ![Static Badge](https://img.shields.io/badge/ASR-purple) ![Static Badge](https://img.shields.io/badge/LLM-purple) ![Static Badge](https://img.shields.io/badge/TTS-purple) ![Static Badge](https://img.shields.io/badge/OCR-purple) ![Static Badge](https://img.shields.io/badge/ImageCaptioning-purple) ![Static Badge](https://img.shields.io/badge/VideoCaptioning-purple) ![Static Badge](https://img.shields.io/badge/MinecraftAIAgent-purple) ![Static Badge](https://img.shields.io/badge/ver-2.3.0-green)
 
 你或许已经听说过著名的 [Neurosama](https://virtualyoutuber.fandom.com/wiki/Neuro-sama)，或者是来自中国的[木几萌](https://mobile.moegirl.org.cn/%E6%9C%A8%E5%87%A0%E8%90%8C)。你是否也想要拥有一个自己的 AI 虚拟形象陪你直播、聊天、打游戏？开源的 Zerolan Live Robot 正致力于实现您的梦想！而这仅仅需要一张消费级显卡！
 
@@ -8,7 +8,7 @@ Zerolan Live Robot 是一款多功能的直播机器人（AI VTuber），它可�
 
 相关项目：[KonekoMinecraftBot](https://github.com/AkagawaTsurunaki/KonekoMinecraftBot)、[ZerolanCore](https://github.com/AkagawaTsurunaki/zerolan-core)、[ZerolanData](https://github.com/AkagawaTsurunaki/zerolan-data)、[ZerolanPlayground](https://github.com/AkagawaTsurunaki/ZerolanPlayground)。
 
-本项目持续开发中，当前的版本为 `2.1.4`，您可以关注开发者的 Bilibili 账号[赤川鹤鸣_Channel](https://space.bilibili.com/1076299680)，正在根据此项目调教 AI 猫娘，不定时直播展示最新进展。
+本项目持续开发中，您可以关注开发者的 Bilibili 账号[赤川鹤鸣_Channel](https://space.bilibili.com/1076299680)，正在根据此项目调教 AI 猫娘，不定时直播展示最新进展。
 
 ## 特点与功能
 
@@ -29,6 +29,7 @@ Zerolan Live Robot 是一款多功能的直播机器人（AI VTuber），它可�
 - [x] 🥳 Live2D 形象控制，嘴型同步、自动眨眼和自主呼吸
 - [x] 🥽 基于 Unity 的 Live2D 形象控制和 3D 模型控制的展示应用
 - [x] ⌨️ 键盘热键控制机器人的麦克风开关
+- [x] 🐧 QQ 机器人的文字、语音和图像多模态回复
 
 ## 安装并运行
 
@@ -71,7 +72,7 @@ pip install -r requirements.txt
 
 不知道什么是 `conda`？请参阅 [Anaconda 官方文档](https://www.anaconda.com/docs/getting-started/main)。
 
-### 配置并启动本项目
+### 配置项目
 
 使用以下命令运行 Zerolan Live Robot 的主程序：
 
@@ -86,7 +87,9 @@ python main.py
 1. WebUI配置：运行 `python webui.py` 将会启动一个 WebUI 的配置界面，你可以在浏览器中访问它（通常是`http://127.0.0.1:7860`），然后根据配置项中的描述和提示进行填写，填写完毕后，可以单击右上角的 Save Config 按钮，这将保存配置到 `./resources/config.yaml`。
 2. 手动修改：直接找到 `./resources/config.yaml` 文件并按照文件内的注释引导填写对应的配置。
 
-建议您详细阅读配置项里的内容（包括注释），这对您理解本项目如何运行和具有哪些功能十分有帮助。
+建议您详细阅读配置项里的内容（包括注释），这对您理解本项目如何运行和具有哪些功能十分有帮助。有一些配置需要额外的工作，请继续看下面的“服务配置”一节。
+
+### 运行项目
 
 **配置文件修改完毕后**，可以再一次运行 `python main.py` 以启动程序，若没有报错则程序已经成功启动。
 
@@ -106,24 +109,83 @@ git pull
 
 当然，如果您已经修改了代码，此操作可能会自动合并代码，但是部分未能解决的冲突需要您自行处理。建议在开发时使用另一个分支而不是主分支 `main`。
 
-### * Minecraft 支持
+## 服务配置
 
-> [!NOTE]
-> 
-> 此步骤是**可选**的。
+### Live2D 展示器
 
-本项目与 [KonekoMinecraftBot](https://github.com/AkagawaTsurunaki/KonekoMinecraftBot) 共同实现了一套 ZerolanProtocol 协议接口，可以从本项目控制在 Minecraft 游戏中的机器人。如有需要请移步至[此处](https://github.com/AkagawaTsurunaki/KonekoMinecraftBot)查看详细。
+基于 [live2d-py](https://github.com/Arkueid/live2d-py)、[OpenGL](https://www.opengl.org/) 和
+[PyQt5](https://pypi.org/project/PyQt5/) 开发的 Live2D 虚拟形象控制器。
+实现了窗口宽高控制、透明背景（可用于 OBS 直播或桌宠），角色自动呼吸控制、自动眨眼控制，说话时嘴型控制。
 
-###  * Zerolan Playground
+### 直播间弹幕读取
 
-> [!NOTE]
-> 
-> 此步骤是**可选**的。因为本项目已经支持了 Live2D 的展示功能，如果你需要 AR 等基于 Unity 和 Vuforia 的功能请继续向下阅览。
+连接到指定直播平台服务，获取弹幕、礼物消息等。支持 Bilibili、YouTube（实验）、Twitch（实验）直播间。
+
+### OBS 字幕控制
+
+OBS 直播流式打字机字幕显示与控制，基于 [OBSWebSocket](https://github.com/obsproject/obs-websocket) 实现。
+
+**如何让本项目自动同步字幕到我的 OBS 直播间？**
+
+您需要开启 OBS 的 WebSocket 服务器。步骤如下：
+1. 打开 OBS。
+2. 找到工具栏中的“工具”选项，选择“WebSocket 服务器设置”。
+3. 点击“生成密码”设置服务器密码。
+4. 点击“显示连接信息”。
+5. 将服务器 IP 、服务器端口和服务器密码填写入配置文件。
+
+然后，在 OBS 主界面的“源”窗口中，按加号添加一个“文本 (GDI+)”组件，右键重命名为 `UserText`，这个文本组件将用于展示用户的语音识别结果；
+同理，再创建一个“文本 (GDI+)”组件，重命名为 `AssistantText`，这个文本组件将用于展示机器人的文字推理结果。
+
+最后，启动本项目即可。正常情况下，会按照您所填写的配置连接 OBS WebSocket 服务器，就可以正常运行了。
+
+### AR 展示器
+
+此步骤是**可选**的。因为本项目已经支持了 Live2D 展示器功能，除非你确实需要 AR 等基于 Unity 和 Vuforia 的功能请继续。
+
+[ZerolanPlayground](https://github.com/AkagawaTsurunaki/ZerolanPlayground) 可以通过语音、拍照与本项目进行 WebSocket 消息同步。
 
 下载对应平台的安装包进行安装，然后在右上角填写你开启本 ZerolanLiveRobot 的服务器地址。
 
 例如，你将 ZerolanLiveRobot 主程序开启在你的电脑的 11013 端口，且你的电脑 IP 为 `192.168.1.114`，那么在服务器地址一栏填写 `ws://192.168.1.114:11013`，最后单击“连接”即可。
 
+### QQ 机器人
+
+基于 NapCat 的 QQ 机器人支持，启用此功能必须先安装 NapCat，详细参阅[NapCatQQ 官方文档](https://napneko.github.io/guide/napcat)。
+
+当您安装完毕后，一般来说，可以通过以下命令访问 Napcat Shell：
+
+```shell
+napcat
+```
+
+一旦您配置好 NatCat 以及登录成功的 QQ 号，请在浏览器访问 NapCat 的 WebUI 界面（不是本项目的那个 WebUI），一般是 http://127.0.0.1:6099。
+
+此时可能要求您输入 Token 登录，这个 Token 在 NapCat 的日志里，步骤是执行 `napcat` 指令后，在 Napcat Shell 界面中向下选择 `LOG 查看日志` 选项，就可以查看日志了。
+
+输入正确的登录 Token 后，点击左侧的“网络配置”，然后点击“新建 > Websocket 服务器”，接着执行下列步骤：
+
+1. 勾选启用
+2. 名称任意
+3. `Host` 默认（如果同一主机），例如 `127.0.0.1`
+4. 端口任意，但一定和你配置文件中的保持一致，例如 `3033`
+5. 消息格式 `Array`
+6. 勾选强制推送事件
+7. 复制 `Token`，例如 `0d000721`
+8. 点击“保存”
+
+假设你是按照上面步骤配置的，在“接口调试 > Websocket”中输入 WebSocket URL 为 `ws://127.0.0.1:3033/`，Token 输入为 `0d000721`，最后点击“连接”。
+如果一切正常，那么 NapCat 就配置完毕了。
+
+### 浏览器控制
+
+基于 Selenium 的简单的浏览器控制器。仅支持 `Firefox`。
+
+功能很简单，如果需要扩展需要自己实现。其中机器人可能会使用 ShowUI 的模型推理结果来调用并控制浏览器。
+
+### Minecraft 智能体
+
+本项目与 [KonekoMinecraftBot](https://github.com/AkagawaTsurunaki/KonekoMinecraftBot) 共同实现了一套 ZerolanProtocol 协议接口，可以从本项目控制在 Minecraft 游戏中的机器人。如有需要请移步至[此处](https://github.com/AkagawaTsurunaki/KonekoMinecraftBot)查看详细。
 
 ## 自定义设计机器人
 
@@ -178,46 +240,7 @@ print(prediction.response)
 
 ### Services
 
-### services.browser
-
-基于 Selenium 的简单的浏览器控制器。仅支持 `Firefox`。
-功能很简单，如果需要扩展需要自己实现。其中机器人可能会使用 ShowUI 的模型推理结果来调用并控制浏览器。
-
-### services.game
-
-用于与其它游戏进行连接和游玩的控制器。目前仅支持原版 Minecraft 平台（且版本受限）。
-
-### services.live2d
-
-基于 [live2d-py](https://github.com/Arkueid/live2d-py)、[OpenGL](https://www.opengl.org/) 和 
-[PyQt5](https://pypi.org/project/PyQt5/) 开发的 Live2D 虚拟形象控制器。
-实现了窗口宽高控制、透明背景（可用于 OBS 直播或桌宠），角色自动呼吸控制、自动眨眼控制，说话时嘴型控制。
-
-### services.live_stream
-
-连接到指定直播平台服务，获取弹幕、礼物消息等。支持 Bilibili、YouTube（实验）、Twitch（实验）直播间。
-
-### services.obs
-
-OBS 直播流式打字机字幕显示与控制，基于 [OBSWebSocket](https://github.com/obsproject/obs-websocket) 实现。
-
-> [!NOTE]
-> 您需要开启 OBS 的 WebSocket 服务器。步骤如下：
-> 1. 打开 OBS。
-> 2. 找到工具栏中的“工具”选项，选择“WebSocket 服务器设置”。
-> 3. 点击“生成密码”设置服务器密码。
-> 4. 点击“显示连接信息”。
-> 5. 将服务器 IP 、服务器端口和服务器密码填写入配置文件。
-
-### services.playground
-
-Zerolan Playground Server 是一个基于 ZerolanProtocol 的 WebSocket 服务器，用于与 Unity 实现的 Zerolan Playground 进行连接和交互。
-
-### services.qqbot
-
-正在开发中……
-
-
+每个服务都可以注册到 `framework/context.py` 中，然后在 `bot.py` 中调用。建议每个服务都放在一个单独的文件夹里，其中包含一个 `config.py` 文件专属于这个服务。
 
 ## License
 

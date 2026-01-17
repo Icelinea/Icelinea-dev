@@ -45,10 +45,16 @@ def _add_field_component(field_info: FieldInfo, field_name: str, field_val: Any)
     elif isinstance(field_val, Enum):
         choices = enum_members_to_str_list(type(field_val))
         comp = gr.Dropdown(label=field_name, info=field_desc, value=field_val.value, choices=choices, interactive=interactive)
-    elif field_type == list or field_type == typing.List[str]:
+    elif field_type == typing.List[str]:
         assert isinstance(field_val, list)
         str_list = [[str(elm)] for elm in field_val]
-        gr.List(label=field_name, value=str_list)
+        label = f'{field_name}: {field_desc}'
+        gr.List(label=label, value=str_list)
+    elif field_type == typing.List[int]:
+        assert isinstance(field_val, list)
+        num_list = [[str(elm)] for elm in field_val]
+        label = f'{field_name}: {field_desc}'
+        gr.List(label=label, value=num_list)
     else:
         logger.warning(f"Field {field_name} with type {field_type} not supported.")
     return comp
@@ -149,6 +155,17 @@ class FieldSetter:
                 for col in row:
                     assert isinstance(col, str)
                     res.append(col)
+        elif field_type == List[int]:
+            res = []
+            for row in val:
+                for col in row:
+                    if isinstance(col, int):
+                        res.append(col)
+                    else:
+                        try:
+                            res.append(int(col))
+                        except ValueError:
+                            raise TypeError(f"Field {field_name} with type {field_type} has element type {type(col)}")
         else:
             res = val
         return res
