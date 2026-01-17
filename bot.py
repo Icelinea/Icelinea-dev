@@ -3,6 +3,7 @@ import os
 from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 from queue import Queue
+from typing import List
 
 from loguru import logger
 from zerolan.data.data.prompt import TTSPrompt
@@ -157,7 +158,7 @@ class ZerolanLiveRobot(BaseBot):
 
                                 # 关麦
                                 self.mic.unset_talk_enabled_event()
-                                
+
                                 # 强制 emit 已经收集的片段
                                 self.mic.force_commit(is_emit=True)
 
@@ -171,7 +172,7 @@ class ZerolanLiveRobot(BaseBot):
 
                                 # TODO: 播放开始提示音，block=True
                                 pass
-                                
+
                                 # 开麦
                                 self.mic.set_talk_enabled_event()
                     else:
@@ -319,6 +320,20 @@ class ZerolanLiveRobot(BaseBot):
                 logger.info("ImgCap: " + caption)
                 emitter.emit(PipelineImgCapEvent(prediction=img_cap_prediction))
 
+        def predict_image_modal(images: List[Path]):
+            results = []
+            for image in images:
+                if image.exists():
+                    ocr_prediction = self.ocr.predict(OCRQuery(img_path=str(image)))
+                    ocr_text = stringify(ocr_prediction.region_results)
+                    img_cap_prediction = self.img_cap.predict(ImgCapQuery(prompt="There", img_path=str(image)))
+                    img_cap_text = img_cap_prediction.caption
+                    results.append({
+                        "ocr": ocr_text,
+                        "sentiment": img_cap_text
+                    })
+            return results
+
         @emitter.on(EventKeyRegistry.QQBot.QQ_MESSAGE)
         def on_qq_message(event: QQMessageEvent):
             prediction = self.emit_llm_prediction(event.message, direct_return=True)
@@ -339,8 +354,16 @@ class ZerolanLiveRobot(BaseBot):
                 prediction = self.tts.predict(query=query)
                 file_path = save_audio(prediction.wave_data, prefix="tts")
                 self.qq.send_speech(event.group_id, str(file_path))
+            elif event.images is not None and len(event.images) > 0:
+                result = predict_image_modal(event.images)
+                query_text = "你看见群友给你发了张图片，内容是：" + str(result)
+                logger.info(f"OCR + ImgCap: {result}")
+                prediction = self.emit_llm_prediction(query_text, direct_return=True)
+                self.qq.send_plain_message(group_id=event.group_id, receiver_id=event.sender_id,
+                                           text=prediction.response)
             else:
-                self.qq.send_plain_message(event.group_id, prediction.response)
+                self.qq.send_plain_message(group_id=event.group_id, receiver_id=event.sender_id,
+                                           text=prediction.response)
 
         @emitter.on(EventKeyRegistry.Pipeline.OCR)
         def on_pipeline_ocr(event: PipelineOCREvent):
@@ -501,4 +524,3 @@ class ZerolanLiveRobot(BaseBot):
             # `playsound(audio_path, block=True)` will block the thread, use `enqueue_sound(audio_path)` instead
             self.speaker.enqueue_sound(audio_path)
             logger.debug("Local speaker enqueue speech data")
-
