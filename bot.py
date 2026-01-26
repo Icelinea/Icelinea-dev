@@ -290,7 +290,7 @@ class ZerolanLiveRobot(BaseBot):
         @emitter.on(EventKeyRegistry.LiveStream.DANMAKU)
         def on_danmaku(event: LiveStreamDanmakuEvent):
             text = f"你收到了一条弹幕，用户“{event.danmaku.username}”说：\n{event.danmaku.content}"
-            self.emit_llm_prediction(event.danmaku.content)
+            self.emit_llm_prediction(text)
 
         # @emitter.on(EventKeyRegistry.System.SECOND)
         # async def on_second_danmaku_check(event: SecondEvent):
